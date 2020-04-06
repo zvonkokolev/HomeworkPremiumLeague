@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using PremierLeague.Core.Entities;
 using Utils;
 using System.IO;
-using System.Text;
 
 namespace PremierLeague.Core
 {
@@ -13,42 +11,25 @@ namespace PremierLeague.Core
 		const string fileToReadFrom = "PremierLeague.csv";
 		public static IEnumerable<Game> ReadFromCsv()
 		{
-			var lines = MyFile.ReadStringMatrixFromCsv(fileToReadFrom, false);
-			List<Game> games = new List<Game>();
-			Game game;
-			Dictionary<string, Team> pairs = new Dictionary<string, Team>();
-			foreach (var item in lines)
-			{
-				if (!pairs.TryGetValue(item[1], out Team teamH))
-				{
-					teamH = new Team { Name = item[1] };
-					pairs.Add(item[1], teamH);
-				}
-				else
-				{
-					teamH.Name = item[1];
-				}
+			var path = MyFile.GetFullNameInApplicationTree(fileToReadFrom);
+			Dictionary<string, Team> teams = new Dictionary<string, Team>();
+			teams = File.ReadAllLines(path)
+				.Select(s => s.Split(';'))
+				.Select(s => s[1])
+				.Distinct()
+				.ToDictionary(s => s, s => new Team { Name = s});
 
-				if (!pairs.TryGetValue(item[2], out Team teamA))
+			var csv = File.ReadAllLines(path)
+				.Select(s => s.Split(';'))
+				.Select(s => new Game()
 				{
-					teamA = new Team { Name = item[2] };
-					pairs.Add(item[2], teamA);
-				}
-				else
-				{
-					teamA.Name = item[2];
-				}
-				game = new Game()
-				{
-					Round = int.Parse(item[0]),
-					HomeTeam = teamH,
-					GuestTeam = teamA,
-					HomeGoals = int.Parse(item[3]),
-					GuestGoals = int.Parse(item[4])
-				};
-				games.Add(game);
-			}
-			return games;
+					Round = int.Parse(s?[0]),
+					HomeTeam = teams.TryGetValue(s?[1], out Team teamH) ? teamH : new Team { Name = s[1] },
+					GuestTeam = teams.TryGetValue(s?[2], out Team teamA) ? teamA : new Team { Name = s[2] },
+					HomeGoals = int.Parse(s?[3]),
+					GuestGoals = int.Parse(s?[4])
+				});
+			return csv;
 		}
 	}
 }
