@@ -12,14 +12,13 @@ namespace PremierLeague.Core
 		public static IEnumerable<Game> ReadFromCsv()
 		{
 			var path = MyFile.GetFullNameInApplicationTree(fileToReadFrom);
-			Dictionary<string, Team> teams = new Dictionary<string, Team>();
-			teams = File.ReadAllLines(path)
+			Dictionary<string, Team> teams = File.ReadAllLines(path)
 				.Select(s => s.Split(';'))
 				.Select(s => s[1])
 				.Distinct()
-				.ToDictionary(s => s, s => new Team { Name = s});
+				.ToDictionary(s => s, s => new Team { Name = s });
 
-			var csv = File.ReadAllLines(path)
+			return File.ReadAllLines(path)
 				.Select(s => s.Split(';'))
 				.Select(s => new Game()
 				{
@@ -29,7 +28,6 @@ namespace PremierLeague.Core
 					HomeGoals = int.Parse(s?[3]),
 					GuestGoals = int.Parse(s?[4])
 				});
-			return csv;
 		}
 	}
 }
