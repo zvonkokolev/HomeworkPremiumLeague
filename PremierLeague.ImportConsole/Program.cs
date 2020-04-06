@@ -85,19 +85,19 @@ namespace PremierLeague.ImportConsole
 				string result = "";
 				var res = unitOfWork.Teams.TeamWithMostGoals();
 				result = $"{res.Item1.Name}: {res.Item2} Tore";
-				PrintResult(caption, result, false);
+				PrintResult(caption, result);
 				caption = "Team mit den meisten geschossenen Auswärtstoren:";
 				res = unitOfWork.Teams.TeamWithMostAwayGoals();
 				result = $"{res.Item1.Name}: {res.Item2} Auswärtstore";
-				PrintResult(caption, result, false);
+				PrintResult(caption, result);
 				caption = "Team mit den meisten geschossenen Heimtoren:";
 				res = unitOfWork.Teams.TeamWithMostHomeGoals();
 				result = $"{res.Item1.Name}: {res.Item2} Heimtore";
-				PrintResult(caption, result, false);
+				PrintResult(caption, result);
 				res = unitOfWork.Teams.TeamWithBestRatio();
 				result = $"{res.Item1.Name}: {res.Item2} Tore";
 				caption = "Team mit dem besten Torverhältnis:";
-				PrintResult(caption, result, false);
+				PrintResult(caption, result);
 
 				var dto = unitOfWork.Teams.GetTeamStatistics();
 				caption = "Team Leistung im Durchschnitt (sortiert nach durchschnittlich geschossene Tore pro Spiel [Absteigend]): ";
@@ -112,7 +112,7 @@ namespace PremierLeague.ImportConsole
 		/// </summary>
 		/// <param name="caption">Enthält die Überschrift</param>
 		/// <param name="result">Enthält das ermittelte Ergebnise</param>
-		private static void PrintResult(string caption, string result, bool table)
+		private static void PrintResult<T>(string caption, params T[] elements)
 		{
 			Console.WriteLine();
 			if (!string.IsNullOrEmpty(caption))
@@ -124,25 +124,15 @@ namespace PremierLeague.ImportConsole
 				Console.ResetColor();
 				Console.WriteLine();
 			}
-				Console.ForegroundColor = ConsoleColor.DarkGray;
-				Console.WriteLine(result);
-				Console.ResetColor();
-				Console.WriteLine();
-		}
-		private static void PrintResult<T>(string caption, IEnumerable<T> elements)
-		{
-			Console.WriteLine();
-			if (!string.IsNullOrEmpty(caption))
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			if (elements.Length == 1)
 			{
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine(new String('=', caption.Length));
-				Console.WriteLine(caption);
-				Console.WriteLine(new String('=', caption.Length));
-				Console.ResetColor();
-				Console.WriteLine();
+				Console.WriteLine(elements[0]);
 			}
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			ConsoleTable.From(elements).Configure(o => o.NumberAlignment = Alignment.Right).Write(Format.Alternative);
+			else
+			{
+				ConsoleTable.From(elements).Configure(o => o.NumberAlignment = Alignment.Right).Write(Format.Alternative);
+			}
 			Console.ResetColor();
 			Console.WriteLine();
 		}
